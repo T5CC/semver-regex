@@ -3,64 +3,69 @@ This repo hosts RexEx solutions to check [SemVer v2.0.0](http://semver.org) comp
 
 Note: These solutions are not canonical and are not guaranteed to capture every edge case.
 
+## Credit
+The following solution comes from @DavidFichtmueller from [semver issue #232](https://github.com/semver/semver/issues/232).
+
 ## Expressions
 ### Without named capture groups
-[regex101 playground](https://regex101.com/r/SPqk0l/1)  
-`^((0|[1-9][0-9]*).(0|[1-9][0-9]*).(0|[1-9][0-9]*))((?:-((?:[0-9A-Za-z-]\.?)*))?(?:\+((?:[0-9A-Za-z-]\.?)*))?)?$`
+[regex101 playground](https://regex101.com/r/SPqk0l/2)  
+`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
 
 ### With named capture groups
-[regex101 playground](https://regex101.com/r/JpUgtQ/1)  
-`^(?P<SemVer>(?P<Major>0|[1-9][0-9]*).(?P<Minor>0|[1-9][0-9]*).(?P<Patch>0|[1-9][0-9]*))(?P<Tags>(?:-(?P<Prerelease>(?:[0-9A-Za-z-]\.?)*))?(?:\+(?P<Meta>(?:[0-9A-Za-z-]\.?)*))?)?$`
+[regex101 playground](https://regex101.com/r/JpUgtQ/2)  
+`^(?<major>0|[1-9]\d*)\.(?<minor>0|[1-9]\d*)\.(?<patch>0|[1-9]\d*)(?:-(?<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$`
 
 ### POSIX compliant
-[regex101 playground](https://regex101.com/r/bvFN5H/1)  
-`^((0|[1-9][0-9]*).(0|[1-9][0-9]*).(0|[1-9][0-9]*))((-(([0-9A-Za-z-]\.{0,1})*)){0,1}(\+(([0-9A-Za-z-]\.{0,1})*)){0,1}){0,1}$`
+[regex101 playground](https://regex101.com/r/bvFN5H/2)  
+`^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(-((0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(\.(0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*)){0,1}(\+([0-9a-zA-Z-]+(\.[0-9a-zA-Z-]+)*)){0,1}$`
 
 ## Breakdown
 ```
-(?# Semantic Versioning 2.0.0 RegEx Matching )
+(?# semantic versioning 2.0.0 regex matching )
 ^
     (?# First capture group of MAJOR.MINOR.PATCH )
-    (?P<SemVer>
-        (?# Alpha-numeric matching without leading zero )
-        (?P<Major>
-            0|[1-9][0-9]*
-        )
-        .
-        (?P<Minor>
-            0|[1-9][0-9]*
-        )
-        .
-        (?P<Patch>
-            0|[1-9][0-9]*
-        )
+    (?<major>
+        0|[1-9]\d*
     )
-    (?# Second capture group for -alpha+meta )
-    (?P<Tags>
-        (?# Silently capture the hyphen )
-        (?:
-            -
-            (?# Create a capture group )
-            (?P<Prerelease>
-                (?# Alpha-numeric matching, including hyphens before periods )
-                (?:
-                    [0-9A-Za-z-]
-                    \.?
-                )*
+    \.
+    (?<minor>
+        0|[1-9]\d*
+    )
+    \.
+    (?<patch>
+        0|[1-9]\d*
+    )
+    (?# Capture Prerelease, if it exists )
+    (?:-
+        (?<prerelease>
+            (?:
+                0
+                |
+                [1-9]\d*
+                |
+                \d*[a-zA-Z-][0-9a-zA-Z-]*
             )
-        )?
-        (?# Silently capture the + )
-        (?:
-            \+
-            (?# Create a capture group )
-            (?P<Meta>
-                (?# Alpha-numeric matching, including hyphens before periods )
+            (?:
+                \.
                 (?:
-                    [0-9A-Za-z-]
-                    \.?
-                )*
-            )
-        )?
+                    0
+                    |
+                    [1-9]\d*
+                    |
+                    \d*[a-zA-Z-][0-9a-zA-Z-]*
+                )
+            )*
+        )
+    )?
+    (?# Capture metadata, if it exists)
+    (?:
+        \+
+        (?<buildmetadata>
+            [0-9a-zA-Z-]+
+            (?:
+                \.[0-9a-zA-Z-]+
+            )*
+        )
     )?
 $
 ```
