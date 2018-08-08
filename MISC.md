@@ -3,14 +3,11 @@
 ## Capture Group Descriptions
 Capture group | description
 --- | ---
-\0 | full match
-\1 | Major.Minor.Patch
-\2 | Major
-\3 | Minor
-\4 | Patch
-\5 | PreReleaseIdentifier
-\6 | PreRelease
-\7 | Build
+\0 | Major
+\1 | Minor
+\2 | Patch
+\3 | PreRelease
+\4 | BuildMetaData
 
 ## SED commands
 ### POSIX Compliance in Condensed Form
